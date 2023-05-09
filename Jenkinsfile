@@ -53,7 +53,7 @@ pipeline {
     stages {
         stage('Build Debug-APK') {
             steps {
-                echo("Build Debug-APK Stage")
+                sh 'echo Build Debug-APK Stage'
                 sh "./gradlew -Pindependent='#$env.BUILD_NUMBER $env.BRANCH_NAME' assembleDebug"
                 archiveArtifacts 'app/build/outputs/apk/debug/paintroid-debug*.apk'
                 plot csvFileName: 'dexcount.csv', csvSeries: [[displayTableFlag: false, exclusionValues: '', file: 'Paintroid/build/outputs/dexcount/*.csv', inclusionFlag: 'OFF', url: '']], group: 'APK Stats', numBuilds: '180', style: 'line', title: 'dexcount'
@@ -68,7 +68,7 @@ pipeline {
             }
             
             steps {
-                echo 'Build with Catroid Stage'
+                sh 'echo Build with Catroid Stage'
                 sh './gradlew publishToMavenLocal -Psnapshot'
                 sh 'rm -rf Catroid; mkdir Catroid'
                 dir('Catroid') {
@@ -107,6 +107,7 @@ pipeline {
             stages {
                 stage('Unit Tests') {
                     steps {
+                        echo 'Tests Unit Tests Stage'
                         sh './gradlew -PenableCoverage -Pjenkins jacocoTestDebugUnitTestReport'
                     }
                     post {
@@ -118,6 +119,7 @@ pipeline {
 
                 stage('Device Tests') {
                     steps {
+                        sh 'echo Tests Device Tests Stage'
                         sh "echo no | avdmanager create avd --force --name android28 --package 'system-images;android-28;default;x86_64'"
                         sh "/home/user/android/sdk/emulator/emulator -no-window -no-boot-anim -noaudio -avd android28 > /dev/null 2>&1 &"
                         sh './gradlew -PenableCoverage -Pjenkins -Pemulator=android28 -Pci createDebugCoverageReport -i'
