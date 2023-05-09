@@ -104,6 +104,7 @@ pipeline {
         }
 
         stage('Tests') {
+            echo 'Tests Stage'
             stages {
                 stage('Unit Tests') {
                     steps {
@@ -116,6 +117,11 @@ pipeline {
                         }
                     }
                 }
+                stage('random Stage'){
+                    steps{
+                        echo 'testing a random Sub stage'
+                    }
+                }
             }
 
             post {
@@ -123,6 +129,9 @@ pipeline {
                     step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "$javaSrc/coverage*.xml", failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false, failNoReports: false])
                 }
             }
+        }
+        stage('Random Top Stage'){
+            echo 'Random Top Stage Echo'
         }
     }
 
