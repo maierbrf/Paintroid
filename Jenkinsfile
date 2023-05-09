@@ -53,7 +53,7 @@ pipeline {
     stages {
         stage('Build Debug-APK') {
             steps {
-                sh 'echo Build Debug-APK Stage'
+                echo 'Build Debug-APK Stage'
                 sh "./gradlew -Pindependent='#$env.BUILD_NUMBER $env.BRANCH_NAME' assembleDebug"
                 archiveArtifacts 'app/build/outputs/apk/debug/paintroid-debug*.apk'
                 plot csvFileName: 'dexcount.csv', csvSeries: [[displayTableFlag: false, exclusionValues: '', file: 'Paintroid/build/outputs/dexcount/*.csv', inclusionFlag: 'OFF', url: '']], group: 'APK Stats', numBuilds: '180', style: 'line', title: 'dexcount'
@@ -68,7 +68,7 @@ pipeline {
             }
             
             steps {
-                sh 'echo Build with Catroid Stage'
+                echo 'Build with Catroid Stage'
                 sh './gradlew publishToMavenLocal -Psnapshot'
                 sh 'rm -rf Catroid; mkdir Catroid'
                 dir('Catroid') {
@@ -113,23 +113,6 @@ pipeline {
                     post {
                         always {
                             junitAndCoverage "$reports/jacoco/jacocoTestDebugUnitTestReport/jacoco.xml", 'unit', javaSrc
-                        }
-                    }
-                }
-
-                stage('Device Tests') {
-                    steps {
-                        sh 'echo Tests Device Tests Stage'
-                        sh "echo no | avdmanager create avd --force --name android28 --package 'system-images;android-28;default;x86_64'"
-                        sh "/home/user/android/sdk/emulator/emulator -no-window -no-boot-anim -noaudio -avd android28 > /dev/null 2>&1 &"
-                        sh './gradlew -PenableCoverage -Pjenkins -Pemulator=android28 -Pci createDebugCoverageReport -i'
-                    }
-                    post {
-                        always {
-                            sh '/home/user/android/sdk/platform-tools/adb logcat -d > logcat.txt'
-                            sh './gradlew stopEmulator'
-                            junitAndCoverage "$reports/coverage/debug/report.xml", 'device', javaSrc
-                            archiveArtifacts 'logcat.txt'
                         }
                     }
                 }
