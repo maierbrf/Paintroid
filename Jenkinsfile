@@ -53,6 +53,7 @@ pipeline {
     stages {
         stage('Build Debug-APK') {
             steps {
+                echo("Build Debug-APK Stage")
                 sh "./gradlew -Pindependent='#$env.BUILD_NUMBER $env.BRANCH_NAME' assembleDebug"
                 archiveArtifacts 'app/build/outputs/apk/debug/paintroid-debug*.apk'
                 plot csvFileName: 'dexcount.csv', csvSeries: [[displayTableFlag: false, exclusionValues: '', file: 'Paintroid/build/outputs/dexcount/*.csv', inclusionFlag: 'OFF', url: '']], group: 'APK Stats', numBuilds: '180', style: 'line', title: 'dexcount'
@@ -67,6 +68,7 @@ pipeline {
             }
             
             steps {
+                echo 'Build with Catroid Stage'
                 sh './gradlew publishToMavenLocal -Psnapshot'
                 sh 'rm -rf Catroid; mkdir Catroid'
                 dir('Catroid') {
@@ -86,6 +88,7 @@ pipeline {
 
         stage('Static Analysis') {
             steps {
+                echo 'Static Analysis Stage'
                 sh './gradlew pmd checkstyle lint detekt'
             }
 
