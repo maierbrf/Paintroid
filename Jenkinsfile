@@ -104,9 +104,6 @@ pipeline {
         }
 
         stage('Tests') {
-            steps{
-                echo 'Tests Stage'
-            }
             stages {
                 stage('Unit Tests') {
                     steps {
