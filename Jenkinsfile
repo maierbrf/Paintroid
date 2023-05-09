@@ -104,34 +104,38 @@ pipeline {
         }
 
         stage('Tests') {
-            echo 'Tests Stage'
-            stages {
-                stage('Unit Tests') {
-                    steps {
-                        echo 'Tests Unit Tests Stage'
-                        sh './gradlew -PenableCoverage -Pjenkins jacocoTestDebugUnitTestReport'
+            steps{
+                echo 'Tests Stage'
+                stages {
+                    stage('Unit Tests') {
+                        steps {
+                            echo 'Tests Unit Tests Stage'
+                            sh './gradlew -PenableCoverage -Pjenkins jacocoTestDebugUnitTestReport'
+                        }
+                        post {
+                            always {
+                                junitAndCoverage "$reports/jacoco/jacocoTestDebugUnitTestReport/jacoco.xml", 'unit', javaSrc
+                            }
+                        }
                     }
-                    post {
-                        always {
-                            junitAndCoverage "$reports/jacoco/jacocoTestDebugUnitTestReport/jacoco.xml", 'unit', javaSrc
+                    stage('random Stage'){
+                        steps{
+                            echo 'testing a random Sub stage'
                         }
                     }
                 }
-                stage('random Stage'){
-                    steps{
-                        echo 'testing a random Sub stage'
-                    }
-                }
-            }
 
-            post {
-                always {
-                    step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "$javaSrc/coverage*.xml", failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false, failNoReports: false])
+                post {
+                    always {
+                        step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "$javaSrc/coverage*.xml", failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false, failNoReports: false])
+                    }
                 }
             }
         }
         stage('Random Top Stage'){
-            echo 'Random Top Stage Echo'
+            steps{
+                echo 'Random Top Stage Echo'
+            }
         }
     }
 
